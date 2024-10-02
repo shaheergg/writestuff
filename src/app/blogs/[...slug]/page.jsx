@@ -71,6 +71,7 @@ const BlogPage = () => {
               {blog?.tags.map((tag, idx) => {
                 return (
                   <span
+                    key={tag.value}
                     className={`px-4 text-sm py-2 rounded-full ${
                       idx === 0
                         ? "bg-cyan-100 text-cyan-700"
