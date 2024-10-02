@@ -74,7 +74,7 @@ export default function Navbar() {
               </div>
             </div>
           </div>
-          <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+          <div className="inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
             <button className="px-4 py-2 text-[14px] rounded-[6px] bg-black text-white">
               Contact Us
             </button>
