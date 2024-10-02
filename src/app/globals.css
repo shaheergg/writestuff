@@ -1,27 +1,43 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+.markdown h1 {
+  font-size: 48px;
+  font-weight: bold;
+  line-height: 56px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.markdown p {
+  font-size: 16px;
+  line-height: 24px;
+  color: #666666;
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+.markdown h2 {
+  font-size: 32px;
+  padding-left: 16px;
+  border-left: 4px solid black;
+  font-weight: bold;
+  line-height: 56px;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+.markdown h3,
+h4,
+h5,
+h6 {
+  font-weight: bold;
+}
+
+.markdown li,
+ul {
+  list-style: disc;
+  list-style-position: inside;
+}
+
+.markdown li,
+ol {
+  list-style: decimal;
+  list-style-position: inside;
 }
