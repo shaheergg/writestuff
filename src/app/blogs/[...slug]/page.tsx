@@ -6,11 +6,41 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import retailSvg from "../../../../public/svg/retail.svg";
 import wholesaleSvg from "../../../../public/svg/wholesale.svg";
+
+// Add these type definitions at the top of your file
+interface Tag {
+  value: string;
+  category: string;
+}
+
+interface SuggestedBlog {
+  id?: string;
+  slug: string;
+  thumbnail: string;
+  title: string;
+  preview?: string;
+}
+
+interface CTA {
+  title: string;
+  retail_url?: string;
+  wholesale_url: string;
+}
+
+interface Blog {
+  thumbnail: string;
+  content: string;
+  tags?: Tag[];
+  faq?: string;
+  suggested?: SuggestedBlog[];
+  cta?: CTA;
+}
+
 const BlogPage = () => {
   const url = "https://globalsavors.com/blog/";
-  const [blog, setBlog] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const { slug } = useParams();
+  const [blog, setBlog] = useState<Blog | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const { slug }: { slug: string[] } = useParams();
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -32,9 +62,9 @@ const BlogPage = () => {
           throw new Error("Error fetching single response.");
         }
         const data = await response.json();
-        setBlog(data);
+        setBlog(data[0]);
         console.log("fetched");
-      } catch (error) {
+      } catch (error: any) {
         console.error(error.message || "error fetching data");
       }
     };
@@ -51,7 +81,7 @@ const BlogPage = () => {
       </div>
     );
   }
-
+  console.log(blog);
   return (
     <div>
       <section className="grid min-h-screen grid-cols-1 gap-4 space-y-6 md:grid-cols-2">
@@ -68,17 +98,17 @@ const BlogPage = () => {
               {blog?.content?.split("\n\n")?.slice(0, 2).join("\n\n")}
             </Markdown>
             <div className="flex items-center gap-2">
-              {blog?.tags.map((tag, idx) => {
+              {blog?.tags?.map((tag, idx) => {
                 return (
                   <span
                     key={tag.value}
                     className={`px-4 text-sm py-2 rounded-full ${
-                      idx === 0
+                      tag.category === "product"
                         ? "bg-cyan-100 text-cyan-700"
-                        : idx === 1
-                        ? "bg-yellow-100 text-yellow-700"
-                        : idx === 2
+                        : tag.category === "product_group"
                         ? "bg-green-100 text-green-700"
+                        : tag.category === "type"
+                        ? "bg-yellow-100 text-yellow-700"
                         : ""
                     }`}
                   >
@@ -159,7 +189,7 @@ const BlogPage = () => {
           Read more articles
         </h2>
         <div className="grid grid-cols-1 gap-8 mx-auto max-w-7xl sm:grid-cols-2 md:grid-cols-4">
-          {blog?.suggested.map((blog, index) => (
+          {blog?.suggested?.map((blog, index) => (
             <Link
               href={`/blogs/${blog.slug.split("/blog/")[1]}`}
               className="space-y-4"
@@ -170,10 +200,11 @@ const BlogPage = () => {
                 src={blog.thumbnail}
                 alt={blog.title || "Blog thumbnail"}
               />
-              <div>
+              <div className="space-y-3">
                 <Markdown className="text-[18px] font-bold">
                   {blog.title}
                 </Markdown>
+                <p className="text-sm text-[#666666]">{blog?.preview}</p>
               </div>
             </Link>
           ))}
@@ -181,14 +212,14 @@ const BlogPage = () => {
       </section>
       <section className="min-h-[60vh] max-w-7xl mx-auto gap-12 flex flex-col items-center justify-center">
         <div>
-          <h2 className="max-w-xl text-[40px] font-bold text-center">
+          <h2 className="max-w-md text-[40px] font-bold text-center">
             {blog?.cta?.title}
           </h2>
         </div>
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
+        <div className="grid grid-cols-1 w-full  gap-12 md:grid-cols-2">
           {blog?.cta?.retail_url && (
             <div className="flex flex-col items-center justify-center space-y-4">
-              <img className="w-56 h-56" src={wholesaleSvg.src} alt="" />
+              <img className="w-56 h-56" src={retailSvg.src} alt="" />
               <a
                 href={blog?.cta?.retail_url}
                 className="px-12 hover:bg-[#17A2B8] hover:text-white py-2 text-sm rounded-md border-2 font-semibold border-[#17A2B8] text-[#17A2B8]"
@@ -198,13 +229,16 @@ const BlogPage = () => {
             </div>
           )}
           <div className="flex flex-col items-center justify-center space-y-4">
-            <img className="w-56 h-56" src={retailSvg.src} alt="" />
+            <img className="w-56 h-56" src={wholesaleSvg.src} alt="" />
             <a
               href={blog?.cta?.wholesale_url}
               className="px-12 hover:bg-[#17A2B8] hover:text-white py-2 text-sm rounded-md border-2 font-semibold border-[#17A2B8] text-[#17A2B8]"
             >
               Get Wholesale pricing
             </a>
+            <small className="text-xs text-[#666666]">
+              Reduce ingredient costs by 5-10%
+            </small>
           </div>
         </div>
       </section>

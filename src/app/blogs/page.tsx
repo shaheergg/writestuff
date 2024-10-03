@@ -1,17 +1,21 @@
 "use client";
 
-import {
-  ArrowLeftIcon,
-  ArrowRightIcon,
-  LockClosedIcon,
-} from "@heroicons/react/24/outline";
-import Image from "next/image";
+import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import Markdown from "react-markdown";
 
+interface Blog {
+  id?: string;
+  slug: string;
+  thumbnail: string;
+  title: string;
+  tags: { value: string; category: string }[];
+  content?: string;
+}
+
 const Blogs = () => {
-  const [blogs, setBlogs] = useState([]);
+  const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
@@ -35,7 +39,7 @@ const Blogs = () => {
         }
 
         setBlogs(data);
-      } catch (error) {
+      } catch (error: any) {
         setError(error.message || "Error fetching blogs");
       } finally {
         setLoading(false);
@@ -104,19 +108,43 @@ const Blogs = () => {
                 className="space-y-4"
                 key={blog.id || index}
               >
-                <img
-                  className="object-cover rounded-md"
-                  src={blog.thumbnail}
-                  alt={blog.title || "Blog thumbnail"}
-                />
+                <div className="relative aspect-square rounded-md bg-gray-200 overflow-hidden">
+                  {blog.thumbnail ? (
+                    <img
+                      className="object-cover"
+                      src={blog.thumbnail}
+                      alt={blog.title || "Blog thumbnail"}
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                      <span className="text-black">No image available</span>
+                    </div>
+                  )}
+                </div>
                 <div>
-                  <span
-                    className={`px-4 py-2 text-xs font-semibold rounded-full ${
-                      colors[index % 3].bg
-                    } ${colors[index % 3].fg}`}
-                  >
-                    {blog.tags[0].value}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {blog?.tags?.map((tag) => {
+                      return (
+                        <span
+                          key={tag.value}
+                          className={`px-2 truncate text-xs py-1 rounded-full ${
+                            tag.category === "product"
+                              ? "bg-cyan-100 text-cyan-700"
+                              : tag.category === "product_group"
+                              ? "bg-green-100 text-green-700"
+                              : tag.category === "type"
+                              ? "bg-yellow-100 text-yellow-700"
+                              : ""
+                          }`}
+                        >
+                          {tag?.value}
+                        </span>
+                      );
+                    })}
+                  </div>
                 </div>
                 <div>
                   <Markdown className="text-[18px] font-bold">
@@ -124,9 +152,7 @@ const Blogs = () => {
                   </Markdown>
                 </div>
                 <div>
-                  <Markdown className="text-sm text-[#666666]">
-                    {blog.content?.split("\n\n")?.slice(1, 2)?.join("\n\n")}
-                  </Markdown>
+                  <p className="text-sm text-[#666666]">{blog.content}</p>
                 </div>
               </Link>
             ))}
